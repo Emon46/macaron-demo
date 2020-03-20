@@ -20,25 +20,23 @@ func Hello(u, p string) bool {
 
 func main() {
 
-	h := &hello{
-		d: 2,
-		s: "maghcaron ",
-	}
-
 	m := macaron.Classic()
 	m.Use(macaron.Static("public"))
 	m.Use(macaron.Renderer())
-	m.Map(h)
 	m.Use(auth.BasicFunc(Hello))
+	h := hello{
+		d: 4,
+		s: "fjhdkjf",
+	}
+
+	//every struct that we will receive from myhandler will have same value as h here
+	m.Map(h)
 
 	m.Use(func() {
 		fmt.Println("u are safe")
 	})
 
 	m.Get("/", myHandler, myHandler1)
-	//m.Get("/", func(h *hello) {
-	//	fmt.Println(h)
-	//})
 
 	//serve
 	//m.Run()
@@ -48,6 +46,10 @@ func main() {
 	})
 
 	m.Get("/get", func(ctx *macaron.Context) string {
+		ctx.Data["hello"] = hello{
+			d: 5,
+			s: "hello erm",
+		}
 		return ctx.GetCookie("user")
 	})
 	m.Get("/hello/*", func(ctx *macaron.Context) string {
@@ -68,9 +70,11 @@ func main() {
 	log.Println(http.ListenAndServe("0.0.0.0:4000", m))
 }
 
-func myHandler(ctx *macaron.Context, hs *hello) {
+func myHandler(ctx *macaron.Context, hs hello, h hello) {
 
-	fmt.Println(*hs)
+	fmt.Println(hs)
+	fmt.Println(h)
+
 	fmt.Println("hi")
 
 }
